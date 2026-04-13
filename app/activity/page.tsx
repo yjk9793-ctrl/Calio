@@ -53,8 +53,9 @@ export default function ActivityPage() {
       .gte('logged_at', today + 'T00:00:00')
       .order('logged_at', { ascending: false })
 
-    setLogs(data ?? [])
-    setTotalBurned((data ?? []).reduce((s, a) => s + a.calories_burned, 0))
+    const actData = (data ?? []) as any[]
+    setLogs(actData)
+    setTotalBurned(actData.reduce((s: number, a: any) => s + a.calories_burned, 0))
   }
 
   const handleSave = async () => {
