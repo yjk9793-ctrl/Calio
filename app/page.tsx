@@ -6,102 +6,101 @@ export default function Home() {
   const router = useRouter()
 
   return (
-    <div style={{
-      width: '100vw',
-      height: '100vh',
-      background: '#0F0E0D',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '60px 32px calc(56px + env(safe-area-inset-bottom))',
-      fontFamily: "'Plus Jakarta Sans', sans-serif",
-    }}>
+    <>
+      <style>{`
+        .splash-wrap {
+          width: 100%;
+          height: 100dvh;
+          background: #0F0E0D;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          padding: 60px 28px max(40px, env(safe-area-inset-bottom, 40px));
+          overflow: hidden;
+        }
+        .splash-btn {
+          width: 100%;
+          padding: 18px;
+          border-radius: 16px;
+          background: #D85A30;
+          color: #fff;
+          font-family: 'Bricolage Grotesque', sans-serif;
+          font-size: 17px;
+          font-weight: 700;
+          border: none;
+          cursor: pointer;
+          letter-spacing: 0.01em;
+          margin-bottom: 14px;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .splash-login {
+          text-align: center;
+          font-size: 14px;
+          color: rgba(255,255,255,0.25);
+          cursor: pointer;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-weight: 300;
+          padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+        }
+        .splash-tagline {
+          font-size: 16px;
+          color: rgba(255,255,255,0.5);
+          text-align: center;
+          line-height: 1.65;
+          font-style: italic;
+          font-weight: 300;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+      `}</style>
 
-      {/* 상단 로고 */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
-          <span style={{
-            fontFamily: "'Bricolage Grotesque', sans-serif",
-            fontSize: 52,
-            fontWeight: 800,
-            color: '#fff',
-            letterSpacing: '-2px',
-            lineHeight: 1,
-          }}>cali</span>
-          <svg width="38" height="52" viewBox="0 0 38 52" style={{ overflow: 'visible' }}>
-            <circle cx="19" cy="31" r="13.5" fill="none" stroke="rgba(216,90,48,0.22)" strokeWidth="8.5"/>
-            <circle cx="19" cy="31" r="13.5" fill="none" stroke="#D85A30" strokeWidth="8.5"
-              strokeDasharray="71 14" strokeLinecap="butt"
-              transform="rotate(-90 19 31)"/>
-            <circle cx="19" cy="17.5" r="4.25" fill="#D85A30"/>
+      <div className="splash-wrap">
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline' }}>
+            <span style={{
+              fontFamily: "'Bricolage Grotesque', sans-serif",
+              fontSize: 56, fontWeight: 800, color: '#fff',
+              letterSpacing: '-2px', lineHeight: 1,
+            }}>cali</span>
+            <svg width="40" height="56" viewBox="0 0 40 56" style={{ overflow: 'visible' }}>
+              <circle cx="20" cy="33" r="14" fill="none" stroke="rgba(216,90,48,0.22)" strokeWidth="9"/>
+              <circle cx="20" cy="33" r="14" fill="none" stroke="#D85A30" strokeWidth="9"
+                strokeDasharray="74 15" strokeLinecap="butt" transform="rotate(-90 20 33)"/>
+              <circle cx="20" cy="19" r="4.5" fill="#D85A30"/>
+            </svg>
+          </div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.22em', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 300 }}>
+            EAT · LIVE · BURN
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+          <svg width="210" height="210" viewBox="0 0 210 210">
+            <circle cx="105" cy="105" r="84" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="30"/>
+            <circle cx="105" cy="105" r="84" fill="none" stroke="#D85A30" strokeWidth="30"
+              strokeDasharray="528" strokeDashoffset="150" strokeLinecap="butt"
+              transform="rotate(-90 105 105)" opacity="0.9"/>
+            <circle cx="105" cy="105" r="52" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="17"/>
+            <circle cx="105" cy="105" r="52" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="17"
+              strokeDasharray="327" strokeDashoffset="130" strokeLinecap="butt"
+              transform="rotate(-90 105 105)"/>
+            <text x="105" y="93" textAnchor="middle"
+              style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 14, fontWeight: 700, fill: 'rgba(255,255,255,0.5)', letterSpacing: '0.08em' }}>TODAY</text>
+            <text x="105" y="120" textAnchor="middle"
+              style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 34, fontWeight: 800, fill: '#fff' }}>−512</text>
+            <text x="105" y="137" textAnchor="middle"
+              style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 12, fontWeight: 300, fill: 'rgba(255,255,255,0.35)' }}>kcal remaining</text>
           </svg>
+          <div className="splash-tagline">먹은 만큼 살고,<br/>사는 만큼 태운다.</div>
         </div>
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.22em', fontWeight: 300 }}>
-          EAT · LIVE · BURN
+
+        <div style={{ width: '100%' }}>
+          <button className="splash-btn" onClick={() => router.push('/auth')}>시작하기</button>
+          <div className="splash-login" onClick={() => router.push('/auth')}>이미 계정이 있어요</div>
         </div>
+
       </div>
-
-      {/* 중앙 링 */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
-        <svg width="200" height="200" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="28"/>
-          <circle cx="100" cy="100" r="80" fill="none" stroke="#D85A30" strokeWidth="28"
-            strokeDasharray="503" strokeDashoffset="144" strokeLinecap="butt"
-            transform="rotate(-90 100 100)" opacity="0.9"/>
-          <circle cx="100" cy="100" r="50" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16"/>
-          <circle cx="100" cy="100" r="50" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="16"
-            strokeDasharray="314" strokeDashoffset="125" strokeLinecap="butt"
-            transform="rotate(-90 100 100)"/>
-          <text x="100" y="90" textAnchor="middle"
-            style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 13, fontWeight: 700, fill: 'rgba(255,255,255,0.5)', letterSpacing: '0.08em' }}>
-            TODAY
-          </text>
-          <text x="100" y="116" textAnchor="middle"
-            style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 32, fontWeight: 800, fill: '#fff' }}>
-            −512
-          </text>
-          <text x="100" y="132" textAnchor="middle"
-            style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 11, fontWeight: 300, fill: 'rgba(255,255,255,0.35)' }}>
-            kcal remaining
-          </text>
-        </svg>
-
-        <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.65, fontStyle: 'italic', fontWeight: 300 }}>
-          먹은 만큼 살고,<br/>사는 만큼 태운다.
-        </div>
-      </div>
-
-      {/* 하단 버튼 */}
-      <div style={{ width: '100%', maxWidth: 400 }}>
-        <button
-          onClick={() => router.push('/auth')}
-          style={{
-            width: '100%',
-            padding: '16px',
-            borderRadius: 14,
-            background: '#D85A30',
-            color: '#fff',
-            fontFamily: "'Bricolage Grotesque', sans-serif",
-            fontSize: 16,
-            fontWeight: 700,
-            border: 'none',
-            cursor: 'pointer',
-            letterSpacing: '0.01em',
-            marginBottom: 12,
-          }}>
-          시작하기
-        </button>
-        <div style={{ textAlign: 'center' }}>
-          <span
-            onClick={() => router.push('/auth')}
-            style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', cursor: 'pointer', fontWeight: 300 }}>
-            이미 계정이 있어요
-          </span>
-        </div>
-      </div>
-
-    
-    </div>
+    </>
   )
 }
