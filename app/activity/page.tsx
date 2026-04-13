@@ -43,7 +43,7 @@ export default function ActivityPage() {
       .select('weight_kg')
       .eq('id', user.id)
       .single()
-    if (userData?.weight_kg) setWeight(Number(userData.weight_kg))
+    if ((userData as any)?.weight_kg) setWeight(Number((userData as any)?.weight_kg))
 
     const today = new Date().toISOString().split('T')[0]
     const { data } = await supabase
