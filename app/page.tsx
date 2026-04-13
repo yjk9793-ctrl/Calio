@@ -1,65 +1,107 @@
-import Image from "next/image";
+'use client'
+
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
+  const router = useRouter()
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div style={{
+      width: '100vw',
+      height: '100vh',
+      background: '#0F0E0D',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '60px 32px 56px',
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+    }}>
+
+      {/* 상단 로고 */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
+          <span style={{
+            fontFamily: "'Bricolage Grotesque', sans-serif",
+            fontSize: 52,
+            fontWeight: 800,
+            color: '#fff',
+            letterSpacing: '-2px',
+            lineHeight: 1,
+          }}>cali</span>
+          <svg width="38" height="52" viewBox="0 0 38 52" style={{ overflow: 'visible' }}>
+            <circle cx="19" cy="31" r="13.5" fill="none" stroke="rgba(216,90,48,0.22)" strokeWidth="8.5"/>
+            <circle cx="19" cy="31" r="13.5" fill="none" stroke="#D85A30" strokeWidth="8.5"
+              strokeDasharray="71 14" strokeLinecap="butt"
+              transform="rotate(-90 19 31)"/>
+            <circle cx="19" cy="17.5" r="4.25" fill="#D85A30"/>
+          </svg>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.22em', fontWeight: 300 }}>
+          EAT · LIVE · BURN
         </div>
-      </main>
+      </div>
+
+      {/* 중앙 링 */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="28"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#D85A30" strokeWidth="28"
+            strokeDasharray="503" strokeDashoffset="144" strokeLinecap="butt"
+            transform="rotate(-90 100 100)" opacity="0.9"/>
+          <circle cx="100" cy="100" r="50" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16"/>
+          <circle cx="100" cy="100" r="50" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="16"
+            strokeDasharray="314" strokeDashoffset="125" strokeLinecap="butt"
+            transform="rotate(-90 100 100)"/>
+          <text x="100" y="90" textAnchor="middle"
+            style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 13, fontWeight: 700, fill: 'rgba(255,255,255,0.5)', letterSpacing: '0.08em' }}>
+            TODAY
+          </text>
+          <text x="100" y="116" textAnchor="middle"
+            style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 32, fontWeight: 800, fill: '#fff' }}>
+            −512
+          </text>
+          <text x="100" y="132" textAnchor="middle"
+            style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 11, fontWeight: 300, fill: 'rgba(255,255,255,0.35)' }}>
+            kcal remaining
+          </text>
+        </svg>
+
+        <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.65, fontStyle: 'italic', fontWeight: 300 }}>
+          먹은 만큼 살고,<br/>사는 만큼 태운다.
+        </div>
+      </div>
+
+      {/* 하단 버튼 */}
+      <div style={{ width: '100%', maxWidth: 400 }}>
+        <button
+          onClick={() => router.push('/auth')}
+          style={{
+            width: '100%',
+            padding: '16px',
+            borderRadius: 14,
+            background: '#D85A30',
+            color: '#fff',
+            fontFamily: "'Bricolage Grotesque', sans-serif",
+            fontSize: 16,
+            fontWeight: 700,
+            border: 'none',
+            cursor: 'pointer',
+            letterSpacing: '0.01em',
+            marginBottom: 12,
+          }}>
+          시작하기
+        </button>
+        <div style={{ textAlign: 'center' }}>
+          <span
+            onClick={() => router.push('/auth')}
+            style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', cursor: 'pointer', fontWeight: 300 }}>
+            이미 계정이 있어요
+          </span>
+        </div>
+      </div>
+
+    
     </div>
-  );
+  )
 }
