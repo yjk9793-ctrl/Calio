@@ -415,7 +415,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   fab: {
     position: 'fixed' as const,
-    bottom: 72,
+    bottom: 80,
     right: '50%',
     transform: 'translateX(calc(50% + 130px))',
     width: 48,

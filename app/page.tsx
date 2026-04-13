@@ -14,7 +14,7 @@ export default function Home() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '60px 32px 56px',
+      padding: '60px 32px calc(56px + env(safe-area-inset-bottom))',
       fontFamily: "'Plus Jakarta Sans', sans-serif",
     }}>
 
