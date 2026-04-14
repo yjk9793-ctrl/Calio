@@ -237,7 +237,10 @@ export default function HomePage() {
         )}
 
         {/* 오늘 기록 */}
-        <div className="sec">오늘의 기록</div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', margin:'0 16px 10px' }}>
+  <div className="sec" style={{ margin:0 }}>오늘의 기록</div>
+  <div onClick={() => router.push('/history')} style={{ fontSize:13, color:'#D85A30', fontWeight:600, cursor:'pointer' }}>전체 보기 →</div>
+</div>
 
         {meals.length === 0 && activities.length === 0 ? (
           <div className="empty">
