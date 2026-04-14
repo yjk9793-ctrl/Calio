@@ -1,0 +1,30 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="1024" height="1024" rx="230" fill="#0F0E0D"/>
+
+  <!-- 바깥 링 트랙 -->
+  <circle cx="512" cy="590" r="285" fill="none" stroke="rgba(216,90,48,0.12)" stroke-width="78"/>
+  <!-- 바깥 링 코랄 약 310도 -->
+  <circle cx="512" cy="590" r="285" fill="none" stroke="#D85A30" stroke-width="78"
+    stroke-dasharray="1548 242" stroke-linecap="round"
+    transform="rotate(-90 512 590)"/>
+
+  <!-- 안쪽 링 트랙 -->
+  <circle cx="512" cy="590" r="178" fill="none" stroke="rgba(29,158,117,0.12)" stroke-width="56"/>
+  <!-- 안쪽 링 틸 약 210도 -->
+  <circle cx="512" cy="590" r="178" fill="none" stroke="#1D9E75" stroke-width="56"
+    stroke-dasharray="653 466" stroke-linecap="round"
+    transform="rotate(-90 512 590)"/>
+
+  <!-- calio 텍스트 (i dot 제외) -->
+  <!-- c -->
+  <text x="512" y="340"
+    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+    font-size="172" font-weight="900"
+    fill="#ffffff"
+    text-anchor="middle"
+    letter-spacing="-8">calio</text>
+
+  <!-- i dot - 코랄 -->
+  <circle cx="583" cy="208" r="18" fill="#D85A30"/>
+</svg>

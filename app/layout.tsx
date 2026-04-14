@@ -21,12 +21,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+     <head>
+  <link href="https://fonts.googleapis.com/..." rel="stylesheet"/>
+  
+  <link rel="manifest" href="/manifest.json"/>
+  <link rel="apple-touch-icon" href="/icons/icon-180.png"/>
+  <meta name="theme-color" content="#D85A30"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="calio"/>
+     </head>
       <body style={{ margin:0, padding:0, overflowX:'hidden' }}>
         {children}
         <BottomNav/>
