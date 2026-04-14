@@ -19,7 +19,7 @@ export interface MealAnalysis {
   confidenceLabel: string
 }
 
-export async function analyzeMealImage(base64Image: string, mediaType: string): Promise<MealAnalysis> {
+export async function generatePositiveComment(summary: DailySummary): Promise<{ today: string, tomorrow: string }> {: Promise<MealAnalysis> {
   const prompt = `이 이미지에 있는 음식을 분석해주세요. 반드시 JSON 형식으로만 응답하세요 (마크다운 없이).
 
 {
@@ -85,8 +85,13 @@ export async function generatePositiveComment(summary: DailySummary): Promise<st
   const net = summary.totalCaloriesIn - summary.totalCaloriesOut
   const remaining = summary.goalCalories - summary.totalCaloriesIn
 
-  const prompt = `오늘의 건강 기록을 보고 따뜻하고 긍정적인 코멘트를 한국어로 2~3문장 작성해주세요.
-죄책감을 주지 말고, 작은 성취도 칭찬해주세요.
+const prompt = `당신은 친절한 건강 코치예요. 오늘의 기록을 보고 아래 형식으로 JSON만 응답해주세요. 다른 텍스트 없이 JSON만.
+
+{
+  "today": "오늘 기록에 대한 따뜻한 칭찬 2문장. 죄책감 없이 작은 성취도 인정해주세요.",
+  "tomorrow": "내일을 위한 구체적인 제안 2문장. 어떤 음식을 먹으면 좋은지, 어떤 활동을 추가하면 좋은지 포함해주세요."
+}
+
 
 오늘 기록:
 - 섭취: ${summary.totalCaloriesIn} kcal (목표: ${summary.goalCalories} kcal)
@@ -105,5 +110,12 @@ export async function generatePositiveComment(summary: DailySummary): Promise<st
     messages: [{ role: 'user', content: prompt }]
   })
 
-  return response.content.map(b => b.type === 'text' ? b.text : '').join('').trim()
+  const text = response.content.map(b => b.type === 'text' ? b.text : '').join('').trim()
+  const match = text.match(/\{[\s\S]*\}/)
+  if (!match) return { today: text, tomorrow: '' }
+  try {
+    return JSON.parse(match[0])
+  } catch {
+    return { today: text, tomorrow: '' }
+  }
 }

@@ -5,13 +5,19 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import InAppNotification from '@/components/InAppNotification'
 
+interface AiComment {
+  today: string
+  tomorrow: string
+}
+
 export default function HomePage() {
   const router = useRouter()
   const [user, setUser]             = useState<any>(null)
   const [meals, setMeals]           = useState<any[]>([])
   const [activities, setActivities] = useState<any[]>([])
   const [loading, setLoading]       = useState(true)
-  const [aiComment, setAiComment]   = useState('')
+  const [aiComment, setAiComment]   = useState<AiComment | null>(null)
+  const [aiLoading, setAiLoading]   = useState(false)
   const [animPctIn, setAnimPctIn]   = useState(0)
   const [animPctOut, setAnimPctOut] = useState(0)
   const [displayNum, setDisplayNum] = useState(0)
@@ -61,29 +67,42 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!loading && meals.length > 0) {
+      setAiLoading(true)
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!session) return
         fetch('/api/comment', { method: 'POST', headers: { 'Authorization': `Bearer ${session.access_token}` } })
-          .then(r => r.json()).then(d => { if (d.comment) setAiComment(d.comment) })
+          .then(r => r.json())
+          .then(d => {
+            if (d.comment) {
+              // JSON 파싱 시도
+              if (typeof d.comment === 'object' && d.comment.today) {
+                setAiComment(d.comment)
+              } else if (typeof d.comment === 'string') {
+                try {
+                  const parsed = JSON.parse(d.comment)
+                  setAiComment(parsed)
+                } catch {
+                  setAiComment({ today: d.comment, tomorrow: '' })
+                }
+              }
+            }
+          })
           .catch(() => {})
+          .finally(() => setAiLoading(false))
       })
     }
   }, [loading])
 
-  // 링 끝점 dot 좌표 계산 (JSX 밖에서)
   const R1 = 82, R2 = 60
   const C1 = 2 * Math.PI * R1
   const C2 = 2 * Math.PI * R2
 
   const dot1Angle = (animPctIn / 100) * 360 - 90
-  const dot1Rad   = dot1Angle * Math.PI / 180
-  const dot1X     = 100 + R1 * Math.cos(dot1Rad)
-  const dot1Y     = 100 + R1 * Math.sin(dot1Rad)
-
+  const dot1X     = 100 + R1 * Math.cos(dot1Angle * Math.PI / 180)
+  const dot1Y     = 100 + R1 * Math.sin(dot1Angle * Math.PI / 180)
   const dot2Angle = (animPctOut / 100) * 360 - 90
-  const dot2Rad   = dot2Angle * Math.PI / 180
-  const dot2X     = 100 + R2 * Math.cos(dot2Rad)
-  const dot2Y     = 100 + R2 * Math.sin(dot2Rad)
+  const dot2X     = 100 + R2 * Math.cos(dot2Angle * Math.PI / 180)
+  const dot2Y     = 100 + R2 * Math.sin(dot2Angle * Math.PI / 180)
 
   const actIcons: Record<string,string>  = { exercise:'🏃', reading:'📖', conversation:'💬', walking:'🚶', meditation:'🧘', music:'🎵', other:'⚡' }
   const actColors: Record<string,string> = { exercise:'#E1F5EE', reading:'#E6F1FB', conversation:'#FAEEDA', walking:'#E1F5EE', meditation:'#EEEDFE', music:'#FBEAF0', other:'#F1EFE8' }
@@ -101,7 +120,7 @@ export default function HomePage() {
         * { -webkit-tap-highlight-color: transparent; }
         .hw { min-height:100dvh; background:#F2F1EE; font-family:'Plus Jakarta Sans',sans-serif; max-width:430px; margin:0 auto; padding-bottom:calc(76px + env(safe-area-inset-bottom,0px)); }
         .hero { background:#0F0E0D; border-radius:0 0 36px 36px; padding:0 20px 28px; margin-bottom:16px; }
-        .hdr { display:flex; justify-content:space-between; align-items:center; padding:52px 0 20px; }
+        .hdr { display:flex; justify-content:space-between; align-items:center; padding:28px 0 20px; }
         .logo-txt { font-family:'Bricolage Grotesque',sans-serif; font-size:28px; font-weight:800; color:#fff; letter-spacing:-0.03em; line-height:1; }
         .date-lbl { font-size:12px; color:rgba(255,255,255,0.35); font-weight:300; margin-top:3px; }
         .av { width:36px; height:36px; border-radius:18px; background:rgba(216,90,48,0.15); display:flex; align-items:center; justify-content:center; font-family:'Bricolage Grotesque',sans-serif; font-size:13px; font-weight:700; color:#D85A30; cursor:pointer; border:1px solid rgba(216,90,48,0.25); }
@@ -114,10 +133,56 @@ export default function HomePage() {
         .stat-lbl { font-size:13px; color:#aaa; margin-bottom:6px; }
         .stat-val { font-family:'Bricolage Grotesque',sans-serif; font-size:30px; font-weight:800; line-height:1; }
         .stat-sub { font-size:12px; color:#aaa; font-weight:300; margin-top:4px; }
-        .ai-card { background:#fff; border-radius:18px; padding:16px 18px; margin:0 16px 12px; display:flex; gap:12px; align-items:flex-start; }
-        .ai-icon { width:36px; height:36px; border-radius:12px; background:#FAECE7; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; font-weight:700; color:#D85A30; }
-        .ai-lbl { font-size:11px; font-weight:700; letter-spacing:0.06em; color:#D85A30; margin-bottom:5px; }
-        .ai-txt { font-size:14px; color:#0F0E0D; line-height:1.65; }
+
+        /* AI 카드 - 새 디자인 */
+        .ai-card {
+          background:#0F0E0D;
+          border-radius:20px;
+          margin:0 16px 12px;
+          overflow:hidden;
+        }
+        .ai-header {
+          display:flex; align-items:center; gap:10px;
+          padding:16px 18px 12px;
+          border-bottom:0.5px solid rgba(255,255,255,0.07);
+        }
+        .ai-header-ic {
+          width:32px; height:32px; border-radius:10px;
+          background:rgba(216,90,48,0.2);
+          display:flex; align-items:center; justify-content:center;
+          font-size:14px; font-weight:700; color:#D85A30; flex-shrink:0;
+        }
+        .ai-header-title {
+          font-family:'Bricolage Grotesque',sans-serif;
+          font-size:14px; font-weight:800; color:#fff;
+        }
+        .ai-header-sub {
+          font-size:11px; color:rgba(255,255,255,0.3); font-weight:300; margin-top:1px;
+        }
+        .ai-section { padding:14px 18px; }
+        .ai-section-label {
+          display:flex; align-items:center; gap:6px;
+          font-size:10px; font-weight:700; letter-spacing:0.1em;
+          text-transform:uppercase; margin-bottom:7px;
+        }
+        .ai-section-dot { width:6px; height:6px; border-radius:3px; }
+        .ai-section-txt { font-size:14px; color:rgba(255,255,255,0.75); line-height:1.7; font-weight:300; }
+        .ai-divider { height:0.5px; background:rgba(255,255,255,0.07); margin:0 18px; }
+        .ai-loading {
+          padding:20px 18px; display:flex; align-items:center; gap:10px;
+        }
+        .ai-loading-dot {
+          width:6px; height:6px; border-radius:3px; background:#D85A30;
+          animation:pulse 1.2s ease-in-out infinite;
+        }
+        .ai-loading-dot:nth-child(2) { animation-delay:0.2s; }
+        .ai-loading-dot:nth-child(3) { animation-delay:0.4s; }
+        @keyframes pulse {
+          0%,100% { opacity:0.3; transform:scale(0.8); }
+          50% { opacity:1; transform:scale(1); }
+        }
+        .ai-loading-txt { font-size:13px; color:rgba(255,255,255,0.3); font-weight:300; }
+
         .sec { font-family:'Bricolage Grotesque',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#aaa; margin:0 16px 8px; }
         .log-card { background:#fff; border-radius:18px; margin:0 16px; padding:4px 16px; }
         .log-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:0.5px solid rgba(0,0,0,0.05); }
@@ -130,11 +195,6 @@ export default function HomePage() {
         .empty-ttl { font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:800; color:#0F0E0D; margin-bottom:6px; margin-top:12px; }
         .empty-sub { font-size:14px; color:#aaa; font-weight:300; line-height:1.5; }
         .fab { position:fixed; bottom:calc(80px + env(safe-area-inset-bottom,0px)); right:20px; width:56px; height:56px; border-radius:28px; background:#D85A30; color:#fff; font-size:28px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; z-index:10; }
-        .bnav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:#fff; border-top:0.5px solid rgba(0,0,0,0.08); display:flex; align-items:center; padding-bottom:env(safe-area-inset-bottom,0px); z-index:10; }
-        .bni { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 0; cursor:pointer; }
-        .bni-ic { font-size:22px; }
-        .bni-lb { font-size:11px; color:#aaa; }
-        .bni-lb.on { color:#D85A30; font-weight:700; }
       `}</style>
 
       <div className="hw">
@@ -163,33 +223,18 @@ export default function HomePage() {
 
           <div className="ring-wrap">
             <svg width="200" height="200" viewBox="0 0 200 200">
-              {/* 장식 원 */}
               <circle cx="100" cy="100" r="98" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="1"/>
               <circle cx="100" cy="100" r="110" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="1"/>
-
-              {/* 바깥 링 트랙 */}
               <circle cx="100" cy="100" r={R1} fill="none" stroke="rgba(216,90,48,0.15)" strokeWidth="16"/>
-              {/* 바깥 링 채움 */}
               <circle cx="100" cy="100" r={R1} fill="none" stroke="#D85A30" strokeWidth="16"
                 strokeDasharray={`${C1 * animPctIn / 100} ${C1}`}
                 strokeLinecap="round" transform="rotate(-90 100 100)"/>
-              {/* 바깥 링 끝점 dot */}
-              {animPctIn > 2 && (
-                <circle cx={dot1X} cy={dot1Y} r="8" fill="#FF7A52"/>
-              )}
-
-              {/* 안쪽 링 트랙 */}
+              {animPctIn > 2 && <circle cx={dot1X} cy={dot1Y} r="8" fill="#FF7A52"/>}
               <circle cx="100" cy="100" r={R2} fill="none" stroke="rgba(29,158,117,0.15)" strokeWidth="12"/>
-              {/* 안쪽 링 채움 */}
               <circle cx="100" cy="100" r={R2} fill="none" stroke="#1D9E75" strokeWidth="12"
                 strokeDasharray={`${C2 * animPctOut / 100} ${C2}`}
                 strokeLinecap="round" transform="rotate(-90 100 100)"/>
-              {/* 안쪽 링 끝점 dot */}
-              {animPctOut > 2 && (
-                <circle cx={dot2X} cy={dot2Y} r="6" fill="#2DC98A"/>
-              )}
-
-              {/* 중앙 텍스트 */}
+              {animPctOut > 2 && <circle cx={dot2X} cy={dot2Y} r="6" fill="#2DC98A"/>}
               <text x="100" y="86" textAnchor="middle"
                 style={{ fontFamily:'Bricolage Grotesque,sans-serif', fontSize:11, fontWeight:600, fill:'rgba(255,255,255,0.35)', letterSpacing:'0.12em' }}>
                 {remaining >= 0 ? 'REMAINING' : 'EXCEEDED'}
@@ -203,7 +248,6 @@ export default function HomePage() {
                 kcal
               </text>
             </svg>
-
             <div className="ring-legend">
               <div className="leg"><div style={{ width:8, height:8, borderRadius:4, background:'#D85A30' }}/><span style={{ color:'rgba(255,255,255,0.55)' }}>섭취 {totalIn.toLocaleString()}</span></div>
               <div className="leg"><div style={{ width:8, height:8, borderRadius:4, background:'#1D9E75' }}/><span style={{ color:'rgba(255,255,255,0.55)' }}>소비 {totalOut.toLocaleString()}</span></div>
@@ -226,25 +270,61 @@ export default function HomePage() {
           </div>
         </div>
 
-{/* 인앱 알림 */}
-<InAppNotification />
+        {/* 인앱 알림 */}
+        <InAppNotification />
 
-        {/* AI 코멘트 */}
-        {aiComment && (
+        {/* AI 코멘트 - 새 디자인 */}
+        {(aiLoading || aiComment) && (
           <div className="ai-card">
-            <div className="ai-icon">✦</div>
-            <div>
-              <div className="ai-lbl">calio AI</div>
-              <div className="ai-txt">{aiComment}</div>
+            <div className="ai-header">
+              <div className="ai-header-ic">✦</div>
+              <div>
+                <div className="ai-header-title">calio AI 코치</div>
+                <div className="ai-header-sub">오늘의 분석 · 내일을 위한 제안</div>
+              </div>
             </div>
+
+            {aiLoading && !aiComment ? (
+              <div className="ai-loading">
+                <div className="ai-loading-dot"/>
+                <div className="ai-loading-dot"/>
+                <div className="ai-loading-dot"/>
+                <div className="ai-loading-txt">AI가 오늘 기록을 분석하고 있어요...</div>
+              </div>
+            ) : aiComment && (
+              <>
+                {/* 오늘 칭찬 */}
+                <div className="ai-section">
+                  <div className="ai-section-label">
+                    <div className="ai-section-dot" style={{ background:'#D85A30' }}/>
+                    <span style={{ color:'#D85A30' }}>오늘 잘했어요</span>
+                  </div>
+                  <div className="ai-section-txt">{aiComment.today}</div>
+                </div>
+
+                {aiComment.tomorrow && (
+                  <>
+                    <div className="ai-divider"/>
+                    {/* 내일 제안 */}
+                    <div className="ai-section">
+                      <div className="ai-section-label">
+                        <div className="ai-section-dot" style={{ background:'#1D9E75' }}/>
+                        <span style={{ color:'#1D9E75' }}>내일을 위한 제안</span>
+                      </div>
+                      <div className="ai-section-txt">{aiComment.tomorrow}</div>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
         )}
 
         {/* 오늘 기록 */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', margin:'0 16px 10px' }}>
-  <div className="sec" style={{ margin:0 }}>오늘의 기록</div>
-  <div onClick={() => router.push('/history')} style={{ fontSize:13, color:'#D85A30', fontWeight:600, cursor:'pointer' }}>전체 보기 →</div>
-</div>
+          <div className="sec" style={{ margin:0 }}>오늘의 기록</div>
+          <div onClick={() => router.push('/history')} style={{ fontSize:13, color:'#D85A30', fontWeight:600, cursor:'pointer' }}>전체 보기 →</div>
+        </div>
 
         {meals.length === 0 && activities.length === 0 ? (
           <div className="empty">
@@ -283,13 +363,6 @@ export default function HomePage() {
       </div>
 
       <button className="fab" onClick={() => router.push('/scan')}>+</button>
-
-      <div className="bnav">
-        <div className="bni"><div className="bni-ic">🏠</div><div className="bni-lb on">홈</div></div>
-        <div className="bni" onClick={() => router.push('/scan')}><div className="bni-ic" style={{ opacity:0.35 }}>📸</div><div className="bni-lb">음식</div></div>
-        <div className="bni" onClick={() => router.push('/activity')}><div className="bni-ic" style={{ opacity:0.35 }}>⚡</div><div className="bni-lb">활동</div></div>
-        <div className="bni" onClick={() => router.push('/stats')}><div className="bni-ic" style={{ opacity:0.35 }}>📊</div><div className="bni-lb">통계</div></div>
-      </div>
     </>
   )
 }
