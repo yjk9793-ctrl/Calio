@@ -130,11 +130,12 @@ export default function MyPage() {
 
         {/* 다크 히어로 */}
         <div className="mp-hero">
-          <div className="mp-hdr">
-            <div className="mp-title">마이페이지</div>
-            <button className="edit-btn" onClick={() => setEditing(!editing)}>
-              {editing ? '취소' : '✏ 수정'}
-            </button>
+         <div className="mp-hdr">
+         <button onClick={() => router.back()} style={{ background:'none', border:'none', fontSize:24, cursor:'pointer', color:'rgba(255,255,255,0.5)', padding:0 }}>←</button>
+          <div className="mp-title">마이페이지</div>
+          <button className="edit-btn" onClick={() => setEditing(!editing)}>
+    {editing ? '취소' : '✏ 수정'}
+          </button>
           </div>
 
           <div className="profile-wrap">
