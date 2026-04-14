@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import InAppNotification from '@/components/InAppNotification'
 
 export default function HomePage() {
   const router = useRouter()
@@ -224,6 +225,9 @@ export default function HomePage() {
             <div className="stat-sub">운동+일상 합산</div>
           </div>
         </div>
+
+{/* 인앱 알림 */}
+<InAppNotification />
 
         {/* AI 코멘트 */}
         {aiComment && (
