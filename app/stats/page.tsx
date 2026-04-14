@@ -86,7 +86,8 @@ export default function StatsPage() {
     setLoading(false)
   }
 
-  const maxKcal = Math.max(...stats.map(d => Math.max(d.kcalIn, d.kcalOut)), goal, 1)
+   const kcalValues = stats.map(d => Math.max(d.kcalIn, d.kcalOut)).concat([goal, 1])
+const maxKcal = kcalValues.reduce((a, b) => Math.max(a, b), 0)
 
   return (
     <>
