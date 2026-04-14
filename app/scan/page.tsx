@@ -30,19 +30,36 @@ export default function ScanPage() {
   const [saved, setSaved] = useState(false)
   const [mealType, setMealType] = useState('snack')
 
-  const handleFile = (file: File) => {
-    setMediaType(file.type || 'image/jpeg')
-    setAnalysis(null)
-    setSaved(false)
-    setError('')
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string
-      setPreview(dataUrl)
-      setBase64(dataUrl.split(',')[1])
+const handleFile = (file: File) => {
+  setAnalysis(null)
+  setSaved(false)
+  setError('')
+
+  const img = new Image()
+  const objectUrl = URL.createObjectURL(file)
+
+  img.onload = () => {
+    // 최대 1200px로 리사이즈
+    const MAX = 1200
+    let w = img.width, h = img.height
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX }
+      else { w = Math.round(w * MAX / h); h = MAX }
     }
-    reader.readAsDataURL(file)
+    const canvas = document.createElement('canvas')
+    canvas.width = w; canvas.height = h
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(img, 0, 0, w, h)
+
+    // 항상 JPEG로 변환
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+    setPreview(dataUrl)
+    setBase64(dataUrl.split(',')[1])
+    setMediaType('image/jpeg')
+    URL.revokeObjectURL(objectUrl)
   }
+  img.src = objectUrl
+}
 
   const handleAnalyze = async () => {
     if (!base64) return
