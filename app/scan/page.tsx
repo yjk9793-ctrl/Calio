@@ -129,10 +129,9 @@ export default function ScanPage() {
       <style>{`
         * { -webkit-tap-highlight-color: transparent; }
         .scan-wrap { min-height:100dvh; background:#fff; font-family:'Plus Jakarta Sans',sans-serif; max-width:430px; margin:0 auto; padding-bottom:40px; }
-        .scan-hdr { display:flex; justify-content:space-between; align-items:center; padding:52px 20px 16px; }
+        .scan-hdr { display:flex; justify-content:space-between; align-items:center; padding:24px 20px 16px; }
         .back-btn { background:none; border:none; font-size:24px; cursor:pointer; color:#888; padding:0; }
-        .hdr-title { font-family:'Bricolage Grotesque',sans-serif; font-size:17px; font-weight:700; color:#0F0E0D; }
-
+        .hdr-title { font-family:'Bricolage Grotesque',sans-serif; font-size:24px; font-weight:800; color:#0F0E0D; }
         .meal-row { display:flex; gap:8px; padding:0 16px 16px; }
         .meal-btn { flex:1; padding:10px 0; border-radius:22px; border:1.5px solid rgba(0,0,0,0.1); background:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:500; color:#888; cursor:pointer; transition:all 0.15s; }
         .meal-btn.on { background:#D85A30; border-color:#D85A30; color:#fff; font-weight:700; }
