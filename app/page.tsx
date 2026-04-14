@@ -92,11 +92,11 @@ export default function Home() {
             <text x="105" y="137" textAnchor="middle"
               style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 12, fontWeight: 300, fill: 'rgba(255,255,255,0.35)' }}>kcal remaining</text>
           </svg>
-          <div className="splash-tagline">먹은 만큼 살고,<br/>사는 만큼 태운다.</div>
+          <div className="splash-tagline">오늘 뭐 먹었어?,<br/>칼리오에게 물어봐.</div>
         </div>
 
         <div style={{ width: '100%' }}>
-          <button className="splash-btn" onClick={() => router.push('/auth')}>시작하기</button>
+          <button className="splash-btn" onClick={() => router.push('/intro')}>시작하기</button>
           <div className="splash-login" onClick={() => router.push('/auth')}>이미 계정이 있어요</div>
         </div>
 
