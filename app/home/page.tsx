@@ -11,6 +11,8 @@ export default function HomePage() {
   const [activities, setActivities] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [aiComment, setAiComment] = useState('')
+  const [animated, setAnimated] = useState(false)
+  const [displayNum, setDisplayNum] = useState(0)
 
   const totalIn  = meals.reduce((s, m) => s + m.calories, 0)
   const totalOut = activities.reduce((s, a) => s + a.calories_burned, 0)
@@ -18,6 +20,10 @@ export default function HomePage() {
   const remaining = goal - totalIn + totalOut
   const pctIn    = Math.min((totalIn / goal) * 100, 100)
   const pctOut   = Math.min((totalOut / goal) * 100, 100)
+
+  // 링 애니메이션: 0에서 실제 값까지 채워지는 효과
+  const [animPctIn, setAnimPctIn]   = useState(0)
+  const [animPctOut, setAnimPctOut] = useState(0)
 
   useEffect(() => {
     const load = async () => {
@@ -38,6 +44,38 @@ export default function HomePage() {
     }
     load()
   }, [router])
+
+  // 로딩 완료 후 애니메이션 시작
+  useEffect(() => {
+    if (loading) return
+    const targetIn  = Math.min((totalIn / goal) * 100, 100)
+    const targetOut = Math.min((totalOut / goal) * 100, 100)
+    const targetNum = Math.abs(remaining)
+
+    const duration = 1200 // ms
+    const steps = 60
+    const interval = duration / steps
+    let step = 0
+
+    // 숫자 카운트업
+    const timer = setInterval(() => {
+      step++
+      const progress = step / steps
+      const ease = 1 - Math.pow(1 - progress, 3) // easeOutCubic
+      setAnimPctIn(targetIn * ease)
+      setAnimPctOut(targetOut * ease)
+      setDisplayNum(Math.round(targetNum * ease))
+      if (step >= steps) {
+        clearInterval(timer)
+        setAnimPctIn(targetIn)
+        setAnimPctOut(targetOut)
+        setDisplayNum(targetNum)
+        setAnimated(true)
+      }
+    }, interval)
+
+    return () => clearInterval(timer)
+  }, [loading])
 
   useEffect(() => {
     if (!loading && meals.length > 0) fetchComment()
@@ -68,6 +106,10 @@ export default function HomePage() {
     breakfast: '아침', lunch: '점심', dinner: '저녁', snack: '간식'
   }
 
+  const r1 = 78, r2 = 57
+  const circ1 = 2 * Math.PI * r1
+  const circ2 = 2 * Math.PI * r2
+
   if (loading) return (
     <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
       <div style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, color: '#7A7570' }}>불러오는 중...</div>
@@ -89,43 +131,26 @@ export default function HomePage() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 56px 20px 16px;
+          padding: 28px 20px 14px;
         }
         .logo-txt {
           font-family: 'Bricolage Grotesque', sans-serif;
-          font-size: 30px;
-          font-weight: 800;
-          color: #0F0E0D;
-          letter-spacing: -0.03em;
-          line-height: 1;
+          font-size: 30px; font-weight: 800; color: #0F0E0D;
+          letter-spacing: -0.03em; line-height: 1;
         }
-        .date-label {
-          font-size: 13px;
-          color: #7A7570;
-          font-weight: 300;
-          margin-top: 3px;
-        }
+        .date-label { font-size: 13px; color: #7A7570; font-weight: 300; margin-top: 3px; }
         .avatar {
-          width: 38px; height: 38px;
-          border-radius: 19px;
-          background: #FAECE7;
-          display: flex; align-items: center; justify-content: center;
+          width: 38px; height: 38px; border-radius: 19px;
+          background: #FAECE7; display: flex; align-items: center; justify-content: center;
           font-family: 'Bricolage Grotesque', sans-serif;
-          font-size: 14px; font-weight: 700; color: #D85A30;
-          cursor: pointer;
+          font-size: 14px; font-weight: 700; color: #D85A30; cursor: pointer;
         }
         .ring-box {
-          background: #FAECE7;
-          border-radius: 22px;
-          margin: 0 16px 14px;
-          padding: 22px 16px 16px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+          background: #FAECE7; border-radius: 22px;
+          margin: 0 16px 14px; padding: 20px 16px 16px;
+          display: flex; flex-direction: column; align-items: center;
         }
-        .ring-legend {
-          display: flex; gap: 24px; margin-top: 10px;
-        }
+        .ring-legend { display: flex; gap: 24px; margin-top: 10px; }
         .legend-item {
           display: flex; align-items: center; gap: 7px;
           font-size: 14px; font-weight: 500;
@@ -134,11 +159,7 @@ export default function HomePage() {
           display: grid; grid-template-columns: 1fr 1fr;
           gap: 12px; margin: 0 16px 14px;
         }
-        .stat-card {
-          background: #F7F5F2;
-          border-radius: 16px;
-          padding: 14px 16px;
-        }
+        .stat-card { background: #F7F5F2; border-radius: 16px; padding: 14px 16px; }
         .stat-label { font-size: 13px; color: #7A7570; margin-bottom: 6px; }
         .stat-val {
           font-family: 'Bricolage Grotesque', sans-serif;
@@ -146,33 +167,21 @@ export default function HomePage() {
         }
         .stat-sub { font-size: 12px; color: #7A7570; font-weight: 300; margin-top: 3px; }
         .ai-box {
-          background: #F7F5F2;
-          border-radius: 16px;
-          padding: 16px 18px;
-          margin: 0 16px 14px;
+          background: #F7F5F2; border-radius: 16px;
+          padding: 16px 18px; margin: 0 16px 14px;
           border-left: 4px solid #D85A30;
         }
-        .ai-label {
-          font-size: 11px; font-weight: 700;
-          letter-spacing: 0.08em; color: #D85A30; margin-bottom: 7px;
-        }
+        .ai-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: #D85A30; margin-bottom: 7px; }
         .ai-text { font-size: 15px; color: #0F0E0D; line-height: 1.65; }
         .sec-title {
           font-family: 'Bricolage Grotesque', sans-serif;
-          font-size: 12px; font-weight: 700;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: #7A7570; margin: 0 16px 10px;
+          font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+          text-transform: uppercase; color: #7A7570; margin: 0 16px 10px;
         }
-        .log-list {
-          background: #F7F5F2;
-          border-radius: 18px;
-          margin: 0 16px;
-          padding: 4px 16px;
-        }
+        .log-list { background: #F7F5F2; border-radius: 18px; margin: 0 16px; padding: 4px 16px; }
         .log-item {
           display: flex; align-items: center; gap: 12px;
-          padding: 13px 0;
-          border-bottom: 0.5px solid rgba(0,0,0,0.06);
+          padding: 13px 0; border-bottom: 0.5px solid rgba(0,0,0,0.06);
         }
         .log-item:last-child { border-bottom: none; }
         .log-icon {
@@ -182,27 +191,18 @@ export default function HomePage() {
         }
         .log-name { font-size: 15px; font-weight: 500; color: #0F0E0D; }
         .log-time { font-size: 13px; color: #7A7570; margin-top: 2px; }
-        .log-cal {
-          font-family: 'Bricolage Grotesque', sans-serif;
-          font-size: 16px; font-weight: 700;
-        }
+        .log-cal { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; }
         .empty-box {
-          background: #F7F5F2; border-radius: 18px;
-          margin: 0 16px; padding: 40px;
-          display: flex; flex-direction: column;
-          align-items: center; text-align: center;
+          background: #F7F5F2; border-radius: 18px; margin: 0 16px; padding: 40px;
+          display: flex; flex-direction: column; align-items: center; text-align: center;
         }
-        .empty-text {
-          font-family: 'Bricolage Grotesque', sans-serif;
-          font-size: 17px; font-weight: 700; color: #0F0E0D; margin-bottom: 6px;
-        }
+        .empty-text { font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 700; color: #0F0E0D; margin-bottom: 6px; }
         .empty-sub { font-size: 14px; color: #7A7570; font-weight: 300; }
         .fab {
           position: fixed;
           bottom: calc(76px + env(safe-area-inset-bottom, 0px));
           right: 20px;
-          width: 54px; height: 54px;
-          border-radius: 27px;
+          width: 54px; height: 54px; border-radius: 27px;
           background: #D85A30; color: #fff;
           font-size: 26px; border: none; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
@@ -212,23 +212,36 @@ export default function HomePage() {
         }
         .bnav {
           position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-          width: 100%; max-width: 430px;
-          background: #fff;
+          width: 100%; max-width: 430px; background: #fff;
           border-top: 0.5px solid rgba(0,0,0,0.08);
           display: flex; align-items: center;
-          padding-bottom: env(safe-area-inset-bottom, 0px);
-          z-index: 10;
+          padding-bottom: env(safe-area-inset-bottom, 0px); z-index: 10;
         }
         .bni {
           flex: 1; display: flex; flex-direction: column;
-          align-items: center; gap: 4px;
-          padding: 12px 0;
-          cursor: pointer;
-          -webkit-tap-highlight-color: transparent;
+          align-items: center; gap: 4px; padding: 12px 0;
+          cursor: pointer; -webkit-tap-highlight-color: transparent;
         }
         .bni-ic { font-size: 22px; }
         .bni-lb { font-size: 11px; color: #7A7570; }
         .bni-lb.on { color: #D85A30; font-weight: 600; }
+
+        /* 링 SVG 애니메이션 */
+        .ring-outer {
+          transition: stroke-dashoffset 0s;
+        }
+        .ring-inner {
+          transition: stroke-dashoffset 0s;
+        }
+
+        /* 숫자 fade-in */
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .num-animated {
+          animation: fadeUp 0.5s ease forwards;
+        }
       `}</style>
 
       <div className="home-wrap">
@@ -257,17 +270,26 @@ export default function HomePage() {
         {/* 칼로리 링 */}
         <div className="ring-box">
           <svg width="190" height="190" viewBox="0 0 190 190">
-            <circle cx="95" cy="95" r="78" fill="none" stroke="#F5C4B3" strokeWidth="15"/>
-            <circle cx="95" cy="95" r="78" fill="none" stroke="#D85A30" strokeWidth="15"
-              strokeDasharray={`${2*Math.PI*78*pctIn/100} ${2*Math.PI*78*(1-pctIn/100)}`}
-              strokeLinecap="butt" transform="rotate(-90 95 95)"/>
-            <circle cx="95" cy="95" r="57" fill="none" stroke="#9FE1CB" strokeWidth="11"/>
-            <circle cx="95" cy="95" r="57" fill="none" stroke="#1D9E75" strokeWidth="11"
-              strokeDasharray={`${2*Math.PI*57*pctOut/100} ${2*Math.PI*57*(1-pctOut/100)}`}
-              strokeLinecap="butt" transform="rotate(-90 95 95)"/>
+            {/* 바깥 링 배경 */}
+            <circle cx="95" cy="95" r={r1} fill="none" stroke="#F5C4B3" strokeWidth="15"/>
+            {/* 바깥 링 채움 - JS 애니메이션 */}
+            <circle cx="95" cy="95" r={r1} fill="none" stroke="#D85A30" strokeWidth="15"
+              strokeDasharray={`${circ1 * animPctIn / 100} ${circ1 * (1 - animPctIn / 100)}`}
+              strokeLinecap="butt" transform="rotate(-90 95 95)"
+              style={{ transition: 'stroke-dasharray 0.016s linear' }}
+            />
+            {/* 안쪽 링 배경 */}
+            <circle cx="95" cy="95" r={r2} fill="none" stroke="#9FE1CB" strokeWidth="11"/>
+            {/* 안쪽 링 채움 */}
+            <circle cx="95" cy="95" r={r2} fill="none" stroke="#1D9E75" strokeWidth="11"
+              strokeDasharray={`${circ2 * animPctOut / 100} ${circ2 * (1 - animPctOut / 100)}`}
+              strokeLinecap="butt" transform="rotate(-90 95 95)"
+              style={{ transition: 'stroke-dasharray 0.016s linear' }}
+            />
+            {/* 중앙 숫자 */}
             <text x="95" y="83" textAnchor="middle"
               style={{ fontFamily: 'Bricolage Grotesque,sans-serif', fontSize: 38, fontWeight: 800, fill: remaining >= 0 ? '#D85A30' : '#E24B4A' }}>
-              {Math.abs(remaining)}
+              {displayNum.toLocaleString()}
             </text>
             <text x="95" y="102" textAnchor="middle"
               style={{ fontFamily: 'Plus Jakarta Sans,sans-serif', fontSize: 13, fontWeight: 300, fill: '#993C1D' }}>
@@ -349,10 +371,8 @@ export default function HomePage() {
         <div style={{ height: 20 }}/>
       </div>
 
-      {/* FAB */}
       <button className="fab" onClick={() => router.push('/scan')}>+</button>
 
-      {/* 하단 네비 */}
       <div className="bnav">
         <div className="bni">
           <div className="bni-ic">🏠</div>
