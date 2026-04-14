@@ -281,7 +281,7 @@ export default function HomePage() {
         <div className="bni"><div className="bni-ic">🏠</div><div className="bni-lb on">홈</div></div>
         <div className="bni" onClick={() => router.push('/scan')}><div className="bni-ic" style={{ opacity:0.35 }}>📸</div><div className="bni-lb">음식</div></div>
         <div className="bni" onClick={() => router.push('/activity')}><div className="bni-ic" style={{ opacity:0.35 }}>⚡</div><div className="bni-lb">활동</div></div>
-        <div className="bni"><div className="bni-ic" style={{ opacity:0.35 }}>📊</div><div className="bni-lb">통계</div></div>
+        <div className="bni" onClick={() => router.push('/stats')}><div className="bni-ic" style={{ opacity:0.35 }}>📊</div><div className="bni-lb">통계</div></div>
       </div>
     </>
   )
