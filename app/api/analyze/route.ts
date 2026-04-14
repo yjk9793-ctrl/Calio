@@ -61,7 +61,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '이미지가 없어요' }, { status: 400 })
     }
 
-    const analysis = await analyzeMealImage(base64Image, mediaType || 'image/jpeg')
+    let analysis
+try {
+  analysis = await analyzeMealImage(base64Image, mediaType || 'image/jpeg')
+} catch (parseErr) {
+  console.error('parse error:', parseErr)
+  return NextResponse.json({ error: '음식을 인식하지 못했어요. 다시 시도해주세요.' }, { status: 422 })
+}
+
+// DB 저장
+const { data: meal, error: insertError } = await supabase
+  .from('meals')
+  .insert({
+    user_id:       user.id,
+    meal_name:     analysis.foodName,
+    meal_type:     mealType || 'snack',
+    calories:      analysis.calories,
+    carbs_g:       parseFloat(analysis.carbs) || 0,
+    protein_g:     parseFloat(analysis.protein) || 0,
+    fat_g:         parseFloat(analysis.fat) || 0,
+    sodium_mg:     parseInt(analysis.sodium) || 0,
+    sugar_g:       parseFloat(analysis.sugar) || 0,
+    fiber_g:       parseFloat(analysis.fiber) || 0,
+    ai_confidence: analysis.confidence,
+    logged_at:     new Date().toISOString(),
+  })
+  .select()
+  .single()
+
+if (insertError) throw insertError
 
     // DB 저장
     const { data: meal, error: insertError } = await supabase
