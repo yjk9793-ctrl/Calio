@@ -7,15 +7,7 @@ import InAppNotification from '@/components/InAppNotification'
 import MetabolicCard from '@/components/MetabolicCard'
 
 interface AiComment { today: string; tomorrow: string }
-
-interface Earning {
-  id: string
-  icon: string
-  label: string
-  amount: number
-  achieved: boolean
-  desc: string
-}
+interface Earning { id: string; icon: string; label: string; amount: number; achieved: boolean; desc: string }
 
 export default function HomePage() {
   const router = useRouter()
@@ -31,7 +23,7 @@ export default function HomePage() {
   const [displayNum, setDisplayNum]     = useState(0)
   const [displayToday, setDisplayToday] = useState(0)
   const [displayMonthly, setDisplayMonthly] = useState(0)
-  const [showBank, setShowBank]         = useState(true)
+  const [showBank, setShowBank]         = useState(false) // 디폴트: 칼로리 링
 
   const totalIn   = meals.reduce((s, m) => s + m.calories, 0)
   const totalOut  = activities.reduce((s, a) => s + a.calories_burned, 0)
@@ -44,14 +36,14 @@ export default function HomePage() {
     const isBalanced = pctOfGoal >= 90 && pctOfGoal <= 110
     const hasVeggieProtein = meals.some(m =>
       m.meal_name?.match(/채소|샐러드|닭|두부|달걀|생선|단백질|브로콜리|시금치|콩|계란|연어|참치|소고기/))
-    const hasActivity = activities.some(a => ['exercise','walking','running'].includes(a.activity_type))
+    const hasActivity  = activities.some(a => ['exercise','walking','running'].includes(a.activity_type))
     const hasLifestyle = activities.some(a => ['reading','conversation','meditation','music'].includes(a.activity_type))
 
     const items: Earning[] = [
-      { id:'balanced', icon:'⚖️', label:'균형 식사', amount:10000, achieved:isBalanced, desc:`목표 칼로리 ±10% 이내 (현재 ${Math.round(pctOfGoal)}%)` },
-      { id:'healthy',  icon:'🥗', label:'건강한 식사', amount:10000, achieved:hasVeggieProtein, desc:'채소·단백질이 포함된 식사' },
-      { id:'activity', icon:'🏃', label:'운동·러닝', amount:10000, achieved:hasActivity, desc:'운동, 걷기, 러닝 기록' },
-      { id:'lifestyle',icon:'📖', label:'일상 활동', amount:10000, achieved:hasLifestyle, desc:'독서, 대화, 명상 등 기록' },
+      { id:'balanced',  icon:'⚖️', label:'균형 식사',  amount:10000, achieved:isBalanced,       desc:`목표 칼로리 ±10% 이내 (현재 ${Math.round(pctOfGoal)}%)` },
+      { id:'healthy',   icon:'🥗', label:'건강한 식사', amount:10000, achieved:hasVeggieProtein, desc:'채소·단백질이 포함된 식사' },
+      { id:'activity',  icon:'🏃', label:'운동·러닝',   amount:10000, achieved:hasActivity,      desc:'운동, 걷기, 러닝 기록' },
+      { id:'lifestyle', icon:'📖', label:'일상 활동',   amount:10000, achieved:hasLifestyle,     desc:'독서, 대화, 명상 등 기록' },
     ]
     if (items.every(i => i.achieved)) {
       items.push({ id:'perfect', icon:'🏆', label:'완벽한 하루 보너스', amount:20000, achieved:true, desc:'4가지 모두 달성!' })
@@ -67,18 +59,13 @@ export default function HomePage() {
     const load = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) { router.push('/auth'); return }
-
       const today = new Date().toISOString().split('T')[0]
-
       const [{ data: ud }, { data: md }, { data: ad }] = await Promise.all([
         supabase.from('users').select('*').eq('id', authUser.id).single(),
         supabase.from('meals').select('*').eq('user_id', authUser.id).gte('logged_at', today + 'T00:00:00').order('logged_at', { ascending: false }),
         supabase.from('activities').select('*').eq('user_id', authUser.id).gte('logged_at', today + 'T00:00:00').order('logged_at', { ascending: false }),
       ])
-
-      setUser(ud)
-      setMeals(md ?? [])
-      setActivities(ad ?? [])
+      setUser(ud); setMeals(md ?? []); setActivities(ad ?? [])
       setMonthlyTotal(((ud as any)?.streak_days ?? 0) * 30000)
       setLoading(false)
     }
@@ -87,14 +74,13 @@ export default function HomePage() {
 
   useEffect(() => {
     if (loading) return
-    const tIn  = Math.min((totalIn / goal) * 100, 100)
+    const tIn = Math.min((totalIn / goal) * 100, 100)
     const tOut = Math.min((totalOut / goal) * 100, 100)
     const steps = 80; let step = 0
     const t = setInterval(() => {
       step++
       const ease = 1 - Math.pow(1 - step / steps, 3)
-      setAnimPctIn(tIn * ease)
-      setAnimPctOut(tOut * ease)
+      setAnimPctIn(tIn * ease); setAnimPctOut(tOut * ease)
       setDisplayNum(Math.round(Math.abs(remaining) * ease))
       setDisplayToday(Math.round(todayEarned * ease))
       setDisplayMonthly(Math.round(monthlyTotal * ease))
@@ -102,8 +88,7 @@ export default function HomePage() {
         clearInterval(t)
         setAnimPctIn(tIn); setAnimPctOut(tOut)
         setDisplayNum(Math.abs(remaining))
-        setDisplayToday(todayEarned)
-        setDisplayMonthly(monthlyTotal)
+        setDisplayToday(todayEarned); setDisplayMonthly(monthlyTotal)
       }
     }, 16)
     return () => clearInterval(t)
@@ -118,31 +103,27 @@ export default function HomePage() {
           .then(r => r.json())
           .then(d => {
             if (d.comment) {
-              if (typeof d.comment === 'object' && d.comment.today) {
-                setAiComment(d.comment)
-              } else if (typeof d.comment === 'string') {
+              if (typeof d.comment === 'object' && d.comment.today) setAiComment(d.comment)
+              else if (typeof d.comment === 'string') {
                 try { setAiComment(JSON.parse(d.comment)) }
                 catch { setAiComment({ today: d.comment, tomorrow: '' }) }
               }
             }
-          })
-          .catch(() => {})
-          .finally(() => setAiLoading(false))
+          }).catch(() => {}).finally(() => setAiLoading(false))
       })
     }
   }, [loading])
 
   const R1 = 82, R2 = 60
   const C1 = 2 * Math.PI * R1, C2 = 2 * Math.PI * R2
-  const dot1X = 100 + R1 * Math.cos(((animPctIn/100)*360-90)*Math.PI/180)
-  const dot1Y = 100 + R1 * Math.sin(((animPctIn/100)*360-90)*Math.PI/180)
+  const dot1X = 100 + R1 * Math.cos(((animPctIn /100)*360-90)*Math.PI/180)
+  const dot1Y = 100 + R1 * Math.sin(((animPctIn /100)*360-90)*Math.PI/180)
   const dot2X = 100 + R2 * Math.cos(((animPctOut/100)*360-90)*Math.PI/180)
   const dot2Y = 100 + R2 * Math.sin(((animPctOut/100)*360-90)*Math.PI/180)
 
   const actIcons: Record<string,string>  = { exercise:'🏃', reading:'📖', conversation:'💬', walking:'🚶', meditation:'🧘', music:'🎵', running:'🏅', other:'⚡' }
   const actColors: Record<string,string> = { exercise:'#E1F5EE', reading:'#E6F1FB', conversation:'#FAEEDA', walking:'#E1F5EE', meditation:'#EEEDFE', music:'#FBEAF0', running:'#E1F5EE', other:'#F1EFE8' }
   const mealLabel: Record<string,string> = { breakfast:'아침', lunch:'점심', dinner:'저녁', snack:'간식' }
-
   const recordDays = meals.length > 0 ? (user?.streak_days ?? 1) : 0
 
   if (loading) return (
@@ -233,7 +214,6 @@ export default function HomePage() {
       `}</style>
 
       <div className="hw">
-
         {/* 다크 히어로 */}
         <div className="hero">
           <div className="hdr">
@@ -249,14 +229,12 @@ export default function HomePage() {
               </div>
               <div className="date-lbl">{new Date().toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'long' })}</div>
             </div>
-            <div className="av" onClick={() => router.push('/mypage')}>
-              {user?.nickname?.[0] ?? '나'}
-            </div>
+            <div className="av" onClick={() => router.push('/mypage')}>{user?.nickname?.[0] ?? '나'}</div>
           </div>
 
           {/* 탭 */}
           <div className="tab-row">
-            <button className={`tab-btn${showBank ? '' : ' on'}`} onClick={() => setShowBank(false)}>칼로리 링</button>
+            <button className={`tab-btn${!showBank ? ' on' : ''}`} onClick={() => setShowBank(false)}>칼로리 링</button>
             <button className={`tab-btn${showBank ? ' on' : ''}`} onClick={() => setShowBank(true)}>💰 칼로리 통장</button>
           </div>
 
