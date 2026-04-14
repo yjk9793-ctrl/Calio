@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import InAppNotification from '@/components/InAppNotification'
+import MetabolicCard from '@/components/MetabolicCard'
 
 interface AiComment { today: string; tomorrow: string }
 
@@ -248,6 +249,12 @@ export default function HomePage() {
         .stat-lbl { font-size:13px; color:#aaa; margin-bottom:6px; }
         .stat-val { font-family:'Bricolage Grotesque',sans-serif; font-size:30px; font-weight:800; line-height:1; }
         .stat-sub { font-size:12px; color:#aaa; font-weight:300; margin-top:4px; }
+
+       {/* 대사 모델 카드 */}
+       <MetabolicCard
+       recordDays={meals.length > 0 ? (user?.streak_days ?? 1) : 0}
+       kcalGoal={goal}
+/>
 
         /* AI 카드 */
         .ai-card { background:#0F0E0D; border-radius:20px; margin:0 16px 12px; overflow:hidden; }
