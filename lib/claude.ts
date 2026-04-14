@@ -56,9 +56,19 @@ export async function analyzeMealImage(base64Image: string, mediaType: string): 
     }]
   })
 
-  const text = response.content.map(b => b.type === 'text' ? b.text : '').join('')
-  const clean = text.replace(/```json|```/g, '').trim()
-  return JSON.parse(clean)
+const text = response.content
+  .map((b: any) => b.type === 'text' ? b.text : '')
+  .join('')
+
+// JSON 블록만 추출
+const jsonMatch = text.match(/\{[\s\S]*\}/)
+if (!jsonMatch) throw new Error('JSON을 찾을 수 없어요')
+
+const clean = jsonMatch[0]
+  .replace(/```json|```/g, '')
+  .trim()
+
+return JSON.parse(clean)
 }
 
 // ── AI 긍정 코멘트 생성 ──
