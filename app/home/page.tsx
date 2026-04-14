@@ -155,7 +155,7 @@ export default function HomePage() {
                 {new Date().toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'long' })}
               </div>
             </div>
-            <div className="av" onClick={() => supabase.auth.signOut().then(() => router.push('/auth'))}>
+            <div className="av" onClick={() => router.push('/mypage')}>
               {user?.nickname?.[0] ?? '나'}
             </div>
           </div>
