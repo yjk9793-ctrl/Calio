@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import BottomNav from "@/components/BottomNav";
 
 export const metadata: Metadata = {
   title: "calio",
@@ -26,7 +27,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body style={{ margin: 0, padding: 0, overflowX: 'hidden' }}>{children}</body>
+      <body style={{ margin:0, padding:0, overflowX:'hidden' }}>
+        {children}
+        <BottomNav/>
+      </body>
     </html>
   );
 }
