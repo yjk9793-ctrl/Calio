@@ -5,6 +5,8 @@ import { useRouter, usePathname } from 'next/navigation'
 export default function BottomNav() {
   const router = useRouter()
   const path = usePathname()
+  const hideOn = ['/', '/auth', '/onboarding']
+  if (hideOn.some(p => path === p || path.startsWith(p))) return null
 
   const items = [
     { label: '홈',  icon: '🏠', href: '/home' },
